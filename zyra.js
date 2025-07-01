@@ -1,9 +1,9 @@
 // zyra.js
-import express from "express";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-import morgan from "morgan";
-import routes from "./routes/api.routes.js"; // ✅ include .js
+import express from "express"; //express
+import dotenv from "dotenv"; //env files
+import mongoose from "mongoose"; //db schema
+import morgan from "morgan"; //logger
+import routes from "./routes/api.routes.js"; // routes
 import { swaggerUi, swaggerSpec } from "./swagger/swagger.js";
 // Load environment variables from .env file
 dotenv.config();
@@ -16,9 +16,18 @@ app.use(express.json());
 //  Add Swagger UI route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Routes
-app.use("/api", routes);
+app.use("/zyra", routes);
 
-//start the server
-app.listen(process.env.PORT || 3000, () =>
-  console.log(`🚀 Server running on port ${process.env.PORT || 3000}`)
-);
+//  Connect to MongoDB Atlas
+mongoose
+  .connect(process.env.DB)
+  .then(() => {
+    console.log(" MongoDB Atlas connected");
+    //start the server
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error(" MongoDB connection error:", err.message);
+    process.exit(1);
+  });
